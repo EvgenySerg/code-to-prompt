@@ -1,0 +1,211 @@
+
+### File: staging-values.yaml
+#--------------------------------------------------------------------------------
+
+service:
+  image:
+    imageUrl: "europe-west4-docker.pkg.dev/investing-com-euro-production/docker-stage-local/earnings"
+    tag: 1.1.4
+  virtualService:
+    url: qagke.forexpros.com
+    hosts:
+      - earnings.qagke.forexpros.com
+
+
+#================================================================================
+
+### File: values.yaml
+#--------------------------------------------------------------------------------
+
+service:
+  serviceName: "api"
+  nameOverride: "api"
+  region: ams
+  env: qa
+  image:
+    pullPolicy: IfNotPresent
+    #imageUrl: ghcr.io/fusionmedialimited/earnings
+    command: [ "./api-linux-amd64" ]
+  config:
+    env:
+      LOG_LEVEL: "-1"
+    mysql:
+      host: "dbqai.forexpros.com"
+      port: "3306"
+      database: "ec_fmedia"
+      user: "quotes_infra_user"
+    scylla:
+      hosts: "10.117.10.137:9042,10.117.10.138:9042,10.117.10.139:9042"
+      keyspace: "quotes_current_refresher"
+    foodb:
+      host: "db52.forexpros.com"
+      port: "3306"
+      database: "FDS"
+      user: "fds1"
+    postgresql:
+      host: "database-1.cijfi4a2tejk.eu-central-1.rds.amazonaws.com"
+      port: "5432"
+      database: "xpress"
+      user: "postgres"
+    id_mapping:
+      address: "dns:///staging-pd-mapping-grpc-multinode.pd-mapping.svc.cluster.local:5001"
+      defaultServiceConfig: '{"loadBalancingConfig": [{"round_robin":{}}]}'
+      cache:
+        ttl: '5m'
+        limit: '100000'
+  secrets:
+    namesuffix: "secret"
+    content:
+      REPLICA_OLTP_MYSQL_PASSWORD: "AgB6z1/4M9u0CzthWIbYNHaUAURYNUvkmZ+5czQjpZXV+ibn3kwckoPFFs3JlezWoljx7TQ5xqqPNya5dB1IgZAvEHWjUsq8/xaQZkhfj2jUbVDR/U/B+w6HxJ273aXmMLQ2kqnUiFXAl6lyZ5hEjLZH13kR8TDExhgJt13hjFOyJbfyE/sNyAuY+SdzqO9Oc7ODjvue8/e6RD/9eeXfT6iAandiDF56S0lZwqHI20NHsYkRFWXZomFx6tD/oSSEPQtWHh2ZZ7YPA0BtBMuH6IuB2StN4/RpaDNjF82CbW3XB4ivhNhUDcF4efDe7C0K2J9hLBXSo5Qwloz/rXlbiGQpw8GV7uKwqVHHsJy5P9ALlFXoF2BU/pno0tILZbahDuoUy4KKUKs83UUeYOzBmkk0c4J9AM/fMZ5SeqnJvO2Rm3EaUPoV9pI40FVNIxhO901+ShWe8Hlxma95i8/yUd5Sp/s1/w1Lz5CkmJ3i5Lqtc5sR3TkoMzl6u4FUtympOs8630t7f2vZmdFcKusQm7d4nl8wxdCswyJCQJqgWQWKgBr39FVtmBWTBtCUSG4rtaLNWt/thrybA37hzg8NyOKQMQwaha2jf26PBDZ6IcNjoHIzbC4OqHzkr5KE9zbDTds3dDoJU1wExxyd7A9tvDACzTxpUohR/364vGnnGDiL44XHGKz5NMKOVMDwCiOxmfiJwcOlMgzQa9bILAqX0ps="
+      FOO_MYSQL_PASSWORD: "AgAytUctOR+71zFVE/lvynzfgATNoIdDkxd6YnSbcfS03eyR/+IGCFfCtWco0GTCuk309KOGSwKZl+Ct013q08H9gHI58QYzBf/ooGmIVU/k2UCHQ/2S6McOYDhQ0232aR8cshZLdHfdtdVtNUZR245mNMzB9ptj7zFXBQqWakxU3ywc/3TpoqwDhWM+KKOYLf5/05Y+66BOI45tBZZec7v11UB5YSQ5MV/UTLmUvu108f96y1rSYuGuUtVREedNoqjhyDcwY3OSy+PT2nxKEsyS0sP98AVdBK8PfEU/1LDteHdL+wpFn4lJeJvta5R+fc77spHKLZvB+zf4XtmP+aVCCdYjdAMh2jF1RrgAM7y53rDbOEBFhyaEytcYXjkKZO1daIsuO5ozl+hgZr1Bc6QtllKu8SSinNRoFu5WUA6sxz0vtbBsDn2mxfoJr7ZYn8zLGmQ5eWsNPQ/3RcVg/2kYsnHUqZPm/aGtuSFDjAiDBwEzk21LCb/I2fjyG7DK+t+qhQHY21LozJEQeUPJsU6fPZXGZbaujB4zz1w90z6BV0LKba56RUlrM2eMVDudP/bpZH0xuVjzJF3cvIrCiBmKuJmxJvRfcMh0oeKP/0PtARgOTge2qxfxmVNLlyfhLUrKwEqMHZx/B4118frdzOCgXupoqR6+qLclvHVrtxi0cCrnBh8x92ywxdxklSHUrGTr+F4pHGo="
+      POSTGRES_PASSWORD: "AgAlR99Q/EjGHsLLD6LvvTfoocG+MUXXBEIbwDAC93zesVJFAocsZ56uO9pWvpm+RFP/hiIm0J5ija30bctV5SfbOyHCPraTlYQzbZ9ypxzDHFUVsGBv+MUV/aomsZ0cXZk3ySJqbFwEgfBN9VUysOUQaLcJKaX95/SdVvsIeHxoTye+r2JWY908hGc9sbvHSF4/LFL6a4w9q7BvvS1XoXUN1yqVf6DhwS/WyKpxvs2oU5MirsxLKyrqInasJo3cVcwhJp8tBFhcaAGMv7vJ4eR48K0sIKREKhBrL6LmwbN21DRFnzbglNcBDdIfCBcVN4EqJ9B1eMZj2FEC/DjvCfi11hjgvlmYKbFjawoWVaeKEmR2l34BXF+E3k2DRt6dbPZzmSM5WNf94Gj53rccESDoeIVzGRz41Md7f78jPiC2csyFAnyoovdRn5fysqwlIgYH2TPgPX6GdRNsfKK9Lfnvdc7fXfPWDBkDQ1QmGjTEyviWHjZwrPCzdoVE5zwKAvFJC/aYd8af1AwE8i8qoB0nNhu0emCVE6YbQvAIbWGDQdjENq6yUQ9JZTlgLs/tlLqE3GMXJHjlrxchHKRmtOkpZOS3e03njRxnYEsVQQnR9gLJ7KihSA53Wc7Zd/g5R00UBkTTu7V8Pi1Y+kxVmJsU0H0tEdUop439TRt8BhC8kOSnP5/RTcWfmRLj2Dt5wRpiBXmeC9Yz7Q=="
+  otel:
+    enabled: true
+  promtail:
+    enabled: true
+  imagePullSecrets:
+    - name: regcred
+  service:
+    ports:
+      metrics:
+        port: 1984
+        targetPort: 1984
+      http:
+        protocol: http
+        port: 80
+        targetPort: 8080
+  virtualService:
+    gateway: istio-system/api-gateway-qa
+    #url: qagke.forexpros.com
+    #hosts:
+    #  - instruments.qagke.forexpros.com
+  resources:
+    requests:
+      cpu: 300m
+      memory: 256Mi
+    limits:
+      cpu: 600m
+      memory: 512Mi
+  deployment:
+    healthEndpoint: "/metrics"
+    healthPort: 1984
+    readinessEndpoint: "/readiness"
+    readinessPort: 1984
+    autoscaling:
+      minReplicas: 2
+      maxReplicas: 10
+      targetCPUUtilizationPercentage: 80
+    env: { }
+  serviceAccount:
+    # Annotations to add to the service account
+    annotations: { }
+    name: ""
+  servicemonitor:
+    enabled: true
+    port: metrics
+
+
+
+
+### File: configmap.yaml
+#--------------------------------------------------------------------------------
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "service.name" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "service.labels" . | nindent 4 }}
+data:
+  REPLICA_OLTP_MYSQL_HOST: "{{ .Values.config.mysql.host }}"
+  REPLICA_OLTP_MYSQL_PORT: "{{ .Values.config.mysql.port }}"
+  REPLICA_OLTP_MYSQL_USER: "{{ .Values.config.mysql.user }}"
+  REPLICA_OLTP_MYSQL_DATABASE: "{{ .Values.config.mysql.database }}"
+  REPLICA_OLTP_MYSQL_MAX_IDLE_TIME: "{{ .Values.config.mysql.pool.maxIdleTime }}"
+  REPLICA_OLTP_MYSQL_MAX_LIFETIME: "{{ .Values.config.mysql.pool.maxLifeTime }}"
+  REPLICA_OLTP_MYSQL_MAX_TOTAL: "{{ .Values.config.mysql.pool.maxTotal }}"
+  REPLICA_OLTP_MYSQL_MAX_IDLE: "{{ .Values.config.mysql.pool.maxIdle }}"
+
+  FOO_MYSQL_HOST: "{{ .Values.config.foodb.host }}"
+  FOO_MYSQL_PORT: "{{ .Values.config.foodb.port }}"
+  FOO_MYSQL_USER: "{{ .Values.config.foodb.user }}"
+  FOO_MYSQL_DATABASE: "{{ .Values.config.foodb.database }}"
+  FOO_MYSQL_MAX_IDLE_TIME: "{{ .Values.config.foodb.pool.maxIdleTime }}"
+  FOO_MYSQL_MAX_LIFETIME: "{{ .Values.config.foodb.pool.maxLifeTime }}"
+  FOO_MYSQL_MAX_TOTAL: "{{ .Values.config.foodb.pool.maxTotal }}"
+  FOO_MYSQL_MAX_IDLE: "{{ .Values.config.foodb.pool.maxIdle }}"
+
+  POSTGRES_HOST: "{{ .Values.config.postgresql.host }}"
+  POSTGRES_PORT: "{{ .Values.config.postgresql.port }}"
+  POSTGRES_USER: "{{ .Values.config.postgresql.user }}"
+  POSTGRES_DATABASE: "{{ .Values.config.postgresql.database }}"
+
+  SCYLLA_DB_HOSTS: "{{ .Values.config.scylla.hosts }}"
+  SCYLLA_DB_KEYSPACE: "{{ .Values.config.scylla.keyspace }}"
+
+  ID_MAPPING_SERVICE_ADDRESS: '{{ .Values.config.id_mapping.address }}'
+  ID_MAPPING_SERVICE_DEFAULT_SERVICE_CONFIG: '{{ .Values.config.id_mapping.defaultServiceConfig }}'
+  ID_MAPPING_SERVICE_CACHE_TTL: '{{ .Values.config.id_mapping.cache.ttl }}'
+  ID_MAPPING_SERVICE_CACHE_LIMIT: '{{ .Values.config.id_mapping.cache.limit }}'
+
+  {{- if .Values.otel.enabled }}
+  OTEL_TRACING_ENABLE: "true"
+  OTEL_ENV: "{{ default .Values.env .Values.otel.env | lower }}"
+  {{- end }}
+  {{- if .Values.datadog.enabled }}
+  DD_ENABLED: "true"
+  DD_ENV: "{{ default .Values.env .Values.datadog.env | lower }}"
+  DD_VERSION: "{{ .Values.image.tag }}"
+  DD_TRACE_ANALYTICS_ENABLED: "{{ .Values.datadog.analytics }}"
+  DD_LOGS_INJECTION: "{{ .Values.datadog.logsInjection }}"
+  DD_PROFILING_ENABLED: "{{ .Values.datadog.profiling }}"
+  DD_RUNTIME_METRICS_ENABLED: "{{ .Values.datadog.runtimeMetrics }}"
+  DD_TRACE_EXPERIMENTAL_RUNTIME_ID_ENABLED: "{{ .Values.datadog.runtimeIdEnabled }}"
+  DD_TRACE_SAMPLE_RATE: "{{ .Values.datadog.sampleRate }}"
+  DATA_DOG_ENABLED: "{{ .Values.datadog.enabled }}"
+  {{- else }}
+  DD_ENABLED: "false"
+  {{- end }}
+
+  {{- if .Values.config.env }}
+  {{- .Values.config.env | toYaml | nindent 2 }}
+  {{- end }}
+
+
+### File: Chart.yaml
+#--------------------------------------------------------------------------------
+
+apiVersion: v2
+name: earnings
+description: A Helm chart for Kubernetes
+type: application
+version: 0.0.6
+appVersion: "0.0.1"
+
+
+#================================================================================
+
+Docker file in the root folder of the prokect.
+FROM golang:1.23.1 as builder
+
+WORKDIR /opt/app
+ARG GH_USER
+ARG GH_TOKEN
+RUN git config --global url.https://${GH_USER}:${GH_TOKEN}@github.com/.insteadOf https://github.com/
+
+COPY ./tools ./tools/
+RUN make -f ./tools/Makefile tools  # tools cache layer
+
+COPY ./go.mod ./go.sum ./
+COPY ./client/go.mod ./client/go.sum ./client/
+RUN go mod download
+
+COPY . .
+RUN make remove_client_tags release
+
+FROM gcr.io/distroless/static:nonroot as app
+WORKDIR /
+COPY --from=builder /opt/app/bin/*-linux-amd64 /
+
+USER 65532:65532
